@@ -13,8 +13,7 @@ CREATE TABLE users (
     user_gender VARCHAR(10) CHECK (user_gender IN ('male', 'female', 'other')),
     user_avatar_url VARCHAR(255),
     user_bio NVARCHAR(MAX),
-    user_country_code VARCHAR(3) DEFAULT 'VN' NOT NULL, -- sử dụng khi 
-    user_last_active DATETIME2 DEFAULT GETDATE(),
+    user_country_code VARCHAR(3) DEFAULT 'VN' NOT NULL,
     user_created_at DATETIME2 DEFAULT GETDATE(),
     user_updated_at DATETIME2 DEFAULT GETDATE(),
 

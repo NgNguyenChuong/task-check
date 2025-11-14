@@ -1,25 +1,26 @@
 CREATE TABLE users (
-    user_id INT PRIMARY KEY IDENTITY(1,1),
+    user_id INT PRIMARY KEY IDENTITY(1,1), -- id user
     user_username VARCHAR(50) NOT NULL UNIQUE, -- use to login
-    user_email VARCHAR(100) NOT NULL UNIQUE,
-    user_password_hash VARCHAR(255) NOT NULL,
-    user_fullname NVARCHAR(100) NOT NULL,
-    user_display_name NVARCHAR(100) NOT NULL,
-    user_avatar_url VARCHAR(255),
-    user_bio NVARCHAR(MAX),
+    user_email VARCHAR(100) NOT NULL UNIQUE, -- email user
+    user_password_hash VARCHAR(255) NOT NULL, -- password hash
+    user_fullname NVARCHAR(100) NOT NULL, --user full name
+    user_display_name NVARCHAR(100) NOT NULL,  -- user display name (có thể khác fullname, ví dụ như biệt danh, nghệ danh hay tên đặc biệt)
+    user_avatar_url VARCHAR(255), -- url ảnh đại diện
+    user_bio NVARCHAR(MAX), -- tiểu sử người dùng
+    user_date_of_birth DATE, -- ngày sinh người dùng, có thể dùng để đề xuất nhạc phù hợp với độ tuổi vì ở cột song có cột song_is_explicit
     user_country_code VARCHAR(3) DEFAULT 'VN' NOT NULL, -- sử dụng khi 
-    user_last_active DATETIME2 DEFAULT GETDATE(),
-    user_created_at DATETIME2 DEFAULT GETDATE(),
-    user_updated_at DATETIME2 DEFAULT GETDATE(),
+    -- user_last_active DATETIME2 DEFAULT GETDATE(),
+    user_created_at DATETIME2 DEFAULT GETDATE(), -- thời điểm tạo tài khoản
+    user_updated_at DATETIME2 DEFAULT GETDATE(), -- thời điểm cập nhật thông tin tài khoản gần nhất
 
     -- soft delete
     -- user_is_active BIT DEFAULT 1,
-    user_role VARCHAR(20) DEFAULT 'user',
+    user_role VARCHAR(20) DEFAULT 'user', -- vai trò của user trong hệ thống: 'user', 'artist', 'admin'
 
     -- Thêm các cột để theo dõi số lần đăng nhập thất bại và trạng thái khóa tài khoản
-    user_failed_login_attempts INT DEFAULT 0,
-    user_last_failed_login DATETIME2 NULL,
-    user_account_locked_until DATETIME2 NULL
+    user_failed_login_attempts INT DEFAULT 0, -- số lần đăng nhập thất bại
+    user_last_failed_login DATETIME2 NULL, -- thời điểm đăng nhập thất bại gần nhất
+    user_account_locked_until DATETIME2 NULL -- thời điểm tài khoản bị khóa hết hạn
 );
 -- Thêm ràng buộc kiểm tra cho cột user_role phải là một trong các giá trị 'user', 'artist', 'admin'
 GO
@@ -30,46 +31,48 @@ GO
 
 CREATE TABLE user_tokens (
     token_id INT PRIMARY KEY IDENTITY(1,1),
-    token_hash VARCHAR(255) UNIQUE NOT NULL,
+    token_hash VARCHAR(255) UNIQUE NOT NULL, -- hash của token để xác thực
     -- thời điểm hết hạn của token
-    token_expires_at DATETIME2 NOT NULL,
-    token_created_at DATETIME2 DEFAULT GETDATE(),
+    token_expires_at DATETIME2 NOT NULL, -- thời điểm hết hạn của token
+    token_created_at DATETIME2 DEFAULT GETDATE(), -- thời điểm tạo token
     token_device_info VARCHAR(255),
     -- đánh dấu token đã bị thu hồi (revoked) hay chưa
-    token_revoked BIT DEFAULT 0,
-    token_ip_address VARCHAR(45),
-    user_id INT NOT NULL
+    token_revoked BIT DEFAULT 0, -- đánh dấu token đã bị thu hồi (revoked) hay chưa
+    token_ip_address VARCHAR(45), -- địa chỉ IP khi tạo token
+    user_id INT NOT NULL -- FK tới bảng users
 );
 GO
-ALTER TABLE user_tokens ADD FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
+ALTER TABLE user_tokens 
+ADD FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE; -- khi user bị xoá thì xoá luôn hết token của user đó
 GO
 
 CREATE TABLE search_history (
-    search_id INT PRIMARY KEY IDENTITY(1,1),
-    search_query_text NVARCHAR(255) NOT NULL,
-    searched_at DATETIME2 DEFAULT GETDATE(),
-    user_id INT NOT NULL
+    search_id INT PRIMARY KEY IDENTITY(1,1), -- id tìm kiếm
+    search_query_text NVARCHAR(255) NOT NULL, -- từ khoá tìm kiếm
+    searched_at DATETIME2 DEFAULT GETDATE(), -- thời điểm tìm kiếm
+    user_id INT NOT NULL -- FK tới bảng users
 );
 GO
-ALTER TABLE search_history ADD FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
+ALTER TABLE search_history 
+ADD FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE; -- khi user bị xoá thì xoá luôn hết lịch sử tìm kiếm của user đó
 GO
 
 CREATE TABLE playlists (
     playlist_id INT PRIMARY KEY IDENTITY(1,1),
-    playlist_name VARCHAR(100) NOT NULL,
-    playlist_description NVARCHAR(MAX),
-    playlist_created_at DATETIME2 DEFAULT GETDATE(),
-    playlist_updated_at DATETIME2 DEFAULT GETDATE(),
-    playlist_is_public BIT DEFAULT 0
+    playlist_name VARCHAR(100) NOT NULL, -- tên playlist
+    playlist_description NVARCHAR(MAX), -- mô tả playlist
+    playlist_created_at DATETIME2 DEFAULT GETDATE(), -- thời điểm tạo playlist
+    playlist_updated_at DATETIME2 DEFAULT GETDATE(), -- thời điểm cập nhật playlist gần nhất(thêm sửa xoá bài hát trong playlist)
+    playlist_is_public BIT DEFAULT 0 -- đánh dấu playlist có công khai hay không
 );
 GO
 
 CREATE TABLE user_playlists (
-    user_id INT NOT NULL, 
-    playlist_id INT NOT NULL,
-    shared_at DATETIME2 DEFAULT GETDATE(),
-    role VARCHAR(20) DEFAULT 'owner',
-    PRIMARY KEY (user_id, playlist_id)
+    user_id INT NOT NULL, -- FK tới bảng users
+    playlist_id INT NOT NULL, -- FK tới bảng playlists
+    shared_at DATETIME2 DEFAULT GETDATE(), -- thời điểm user được chia sẻ playlist
+    role VARCHAR(20) DEFAULT 'owner', -- vai trò của user trong playlist: 'owner', 'contributor', 'viewer'
+    PRIMARY KEY (user_id, playlist_id) 
 );
 GO
 ALTER TABLE user_playlists ADD FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
@@ -83,63 +86,67 @@ GO
 
 CREATE TABLE artists (
     artist_id INT PRIMARY KEY IDENTITY(1,1),
-    artist_name NVARCHAR(255) NOT NULL, 
-    artist_avatar_url VARCHAR(255),
-    artist_description NVARCHAR(MAX),
-    artist_country_code VARCHAR(3) NOT NULL,
-    artist_created_at DATETIME2 DEFAULT GETDATE(),
-    artist_updated_at DATETIME2 DEFAULT GETDATE(),
+    artist_name NVARCHAR(255) NOT NULL, -- tên nghệ sĩ(có thể là tên thật hoặc nghệ danh)
+    artist_avatar_url VARCHAR(255), -- url ảnh đại diện nghệ sĩ
+    artist_description NVARCHAR(MAX), -- mô tả về nghệ sĩ
+    artist_country_code VARCHAR(3) NOT NULL, -- mã quốc gia nghệ sĩ
+    artist_created_at DATETIME2 DEFAULT GETDATE(), -- ngày nghệ sĩ được thêm vào hệ thống
+    artist_updated_at DATETIME2 DEFAULT GETDATE(), -- ngày nghệ sĩ được cập nhật thông tin gần nhất
     --soft  delete
-    artist_deleted_at DATETIME2 NULL,
+    artist_deleted_at DATETIME2 NULL, -- ngày nghệ sĩ bị xoá khỏi hệ thống
     -- artist có thể là 1 user trong hệ thống
     artist_user_id INT NULL
 );
 GO
-ALTER TABLE artists ADD FOREIGN KEY (artist_user_id) REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE artists 
+ADD FOREIGN KEY (artist_user_id) REFERENCES users(user_id) ON DELETE SET NULL; -- khi user bị xoá thì set NULL cột artist_user_id 
 GO
 
 CREATE TABLE albums (
     album_id INT PRIMARY KEY IDENTITY(1,1),
-    album_title NVARCHAR(255) NOT NULL,
-    -- ngày ra mắt album
-    album_release_date DATE,
-    -- ngày album được thêm vào hệ thống
-    album_created_at DATETIME2 DEFAULT GETDATE(),
-    album_updated_at DATETIME2 DEFAULT GETDATE(),
-    album_deleted_at DATETIME2 NULL,
-    album_cover_url VARCHAR(255),
-    artist_id INT NOT NULL
+    album_title NVARCHAR(255) NOT NULL, -- tiêu đề album , tên album
+    album_description NVARCHAR(MAX), -- mô tả về album
+   
+    album_release_date DATE, -- ngày ra mắt album
+
+    album_created_at DATETIME2 DEFAULT GETDATE(), -- ngày album được thêm vào hệ thống
+    album_updated_at DATETIME2 DEFAULT GETDATE(), -- ngày album được cập nhật thông tin gần nhất
+    album_deleted_at DATETIME2 NULL, -- ngày album xoá khỏi hệ thống, xoá mềm
+    album_cover_url VARCHAR(255), -- url ảnh bìa album
+    artist_id INT NOT NULL -- FK tới bảng artists
 );
 GO
 ALTER TABLE albums ADD FOREIGN KEY (artist_id) REFERENCES artists(artist_id) ON DELETE NO ACTION;
 GO
 
 CREATE TABLE songs (
-    song_id INT PRIMARY KEY IDENTITY(1,1),
-    song_title NVARCHAR(255) NOT NULL,
-    song_release_date DATE,
-    song_duration_seconds INT,
-    song_created_at DATETIME2 DEFAULT GETDATE(),
-    song_updated_at DATETIME2 DEFAULT GETDATE(),
-    song_deleted_at DATETIME2 NULL,
-    song_play_count INT DEFAULT 0,
-    song_is_explicit BIT DEFAULT 0,
-    song_cover_url VARCHAR(255),
-    song_audio_url VARCHAR(255) NOT NULL UNIQUE,
-    album_id INT NULL
+    song_id INT PRIMARY KEY IDENTITY(1,1), -- ID bài hát
+    song_title NVARCHAR(255) NOT NULL, -- tiêu đề bài hát, tên bài hát
+    song_description NVARCHAR(MAX), -- mô tả về bài hát
+    song_release_date DATE, -- ngày phát hành bài hát
+    song_duration_seconds INT, -- thời gian bài hát (giây)
+    song_created_at DATETIME2 DEFAULT GETDATE(), -- ngày bài hát được thêm vào hệ thống
+    song_updated_at DATETIME2 DEFAULT GETDATE(), -- ngày bài hát được cập nhật thông tin gần nhất
+    song_deleted_at DATETIME2 NULL, -- ngày bài hát bị xoá khỏi hệ thống
+    song_play_count INT DEFAULT 0, -- số lần bài hát được phát
+    song_is_explicit BIT DEFAULT 0, -- đánh dấu bài hát có nội dung dành cho người lớn
+    song_cover_url VARCHAR(255), -- url ảnh bìa bài hát
+    song_audio_url VARCHAR(255) NOT NULL UNIQUE, -- url file audio bài hát
+    album_id INT NULL -- FK tới bảng albums
 );
 GO
 ALTER TABLE songs ADD FOREIGN KEY (album_id) REFERENCES albums(album_id) ON DELETE SET NULL;
 GO
+-- rằng buộc bài hát phải có thời lượng dương
 ALTER TABLE songs
 ADD CONSTRAINT CHK_song_duration_positive CHECK (song_duration_seconds > 0);
 GO
 
 CREATE TABLE lyrics (
-    lyric_id INT PRIMARY KEY IDENTITY(1,1),
-    song_id INT NOT NULL UNIQUE, 
-    lyric_text NVARCHAR(MAX),
-    FOREIGN KEY (song_id) REFERENCES songs(song_id) ON DELETE CASCADE
+    lyric_id INT PRIMARY KEY IDENTITY(1,1), -- ID lời bài hát
+    song_id INT NOT NULL UNIQUE,  -- FK tới bảng songs, mỗi bài hát chỉ có 1 lời
+    lyric_text NVARCHAR(MAX), -- nội dung lời bài hát
+    FOREIGN KEY (song_id) REFERENCES songs(song_id) ON DELETE CASCADE -- khi bài hát bị xoá thì xoá luôn lời bài hát
 );
 GO
 
