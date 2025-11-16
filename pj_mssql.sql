@@ -59,7 +59,7 @@ GO
 
 CREATE TABLE playlists (
     playlist_id INT PRIMARY KEY IDENTITY(1,1),
-    playlist_name VARCHAR(100) NOT NULL, -- tên playlist
+    playlist_name NVARCHAR(100) NOT NULL, -- tên playlist
     playlist_description NVARCHAR(MAX), -- mô tả playlist
     playlist_created_at DATETIME2 DEFAULT GETDATE(), -- thời điểm tạo playlist
     playlist_updated_at DATETIME2 DEFAULT GETDATE(), -- thời điểm cập nhật playlist gần nhất(thêm sửa xoá bài hát trong playlist)
@@ -207,7 +207,7 @@ GO
 
 
 CREATE TABLE listens(
-    listen_id INT PRIMARY KEY IDENTITY(1,1),
+    listen_id BIGINT PRIMARY KEY IDENTITY(1,1),
     listen_user_id INT NOT NULL,
     listen_song_id INT NOT NULL,
     listened_at DATETIME2 DEFAULT GETDATE(),
@@ -255,10 +255,11 @@ CREATE TABLE user_follow_users (
     PRIMARY KEY (follower_id, following_id)
 )
 GO
-ALTER TABLE user_follow_users ADD FOREIGN KEY (follower_id) REFERENCES users(user_id) ON DELETE CASCADE;
+ALTER TABLE user_follow_users ADD FOREIGN KEY (follower_id) REFERENCES users(user_id) ON DELETE NO ACTION;
 GO
-ALTER TABLE user_follow_users ADD FOREIGN KEY (following_id) REFERENCES users(user_id) ON DELETE CASCADE;
+ALTER TABLE user_follow_users ADD FOREIGN KEY (following_id) REFERENCES users(user_id) ON DELETE NO ACTION;
 GO
+-- có trigger xoá folloing id khi xoá user
 ALTER TABLE user_follow_users 
 ADD CONSTRAINT CHK_no_self_follow 
 CHECK (follower_id <> following_id);
@@ -295,6 +296,7 @@ CREATE TABLE plans (
     plan_name NVARCHAR(30) NOT NULL DEFAULT 'free',
     plan_is_active BIT DEFAULT 1,
     plan_price DECIMAL(10, 2) NOT NULL,
+    plan_currency VARCHAR(3) DEFAULT 'VND' NOT NULL,
     plan_billing_cycle VARCHAR(30) NOT NULL,
     plan_description NVARCHAR(MAX),
     plan_deleted_at DATETIME2 NULL,
@@ -312,7 +314,7 @@ CHECK (plan_billing_cycle IN ('monthly', 'annually', 'perpetual'));
 GO
 ALTER TABLE plans
 ADD CONSTRAINT UQ_plan_name_cycle
-UNIQUE (plan_name, plan_billing_cycle);
+UNIQUE (plan_name, plan_billing_cycle, plan_currency);
 GO
 
 CREATE TABLE subscriptions (
@@ -343,6 +345,7 @@ GO
 CREATE TABLE payments (
     payment_id INT PRIMARY KEY IDENTITY(1,1),
     payment_amount DECIMAL(10, 2) NOT NULL,
+    payment_currency VARCHAR(3) DEFAULT 'VND' NOT NULL,
     payment_method VARCHAR(50) NOT NULL,
     payment_status VARCHAR(50) NOT NULL,
     payment_created_at DATETIME2 DEFAULT GETDATE(),
@@ -581,5 +584,42 @@ BEGIN
         FROM user_playlists up
         WHERE up.playlist_id = d.playlist_id AND up.role = 'owner'
     );
+END;
+GO
+
+
+-- Procedure xoá user an toàn, tránh user follow user mồ côi
+
+
+CREATE PROCEDURE sp_DeleteUser
+    @UserIDToDelete INT
+AS
+BEGIN
+    -- Tắt các thông báo "x rows affected"
+    SET NOCOUNT ON;
+    
+    -- Transaction để đảm bảo tính toàn vẹn dữ liệu
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        -- 1. Dọn dẹp thủ công bảng có vấn đề TRƯỚC
+        DELETE FROM user_follow_users
+        WHERE follower_id = @UserIDToDelete OR following_id = @UserIDToDelete;
+
+        -- 2. Xóa người dùng thật S.A.U
+        -- (Lệnh này sẽ kích hoạt tất cả các ON DELETE CASCADE khác)
+        DELETE FROM users
+        WHERE user_id = @UserIDToDelete;
+
+        -- 3. Nếu mọi thứ thành công
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        -- 4. Nếu có lỗi, hủy bỏ mọi thay đổi
+        ROLLBACK TRANSACTION;
+        
+        -- Báo lỗi ra cho ứng dụng
+        THROW; 
+    END CATCH
 END;
 GO

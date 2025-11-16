@@ -1,3 +1,4 @@
+SELECT * FROM users;
 SELECT * FROM user_tokens;
 SELECT * FROM search_history;
 SELECT * FROM playlists;
@@ -22,20 +23,20 @@ SELECT * FROM payments;
 
 
 
--- câu lệnh update
+-- Câu lệnh update
 
--- update bio của user có username là 'chuong_user'
+-- Cập nhật bio của user có username là 'chuong_user'
 UPDATE users
 SET user_bio = N'Đây là bio mới của tôi. Tôi thích nghe nhạc Pop.'
 WHERE user_username = 'chuong_user';
 
--- update tên và mô tả của playlist thành Nhạc chill và mô tả thành Nhẹ nhàng, vui vẻ cho playlist có playlist_id = 5
+-- Cập nhật tên và mô tả của playlist thành Nhạc chill và mô tả thành Nhẹ nhàng, vui vẻ cho playlist có playlist_id = 5
 UPDATE playlists
 SET playlist_name = N'Nhạc chill',
     playlist_description = N'Nhẹ nhàng, vui vẻ'
 WHERE playlist_id = 5;
 
--- update role của user_id = 5 trong playlist_id = 1 thành 'contributor'
+-- Cập nhật role của user_id = 5 trong playlist_id = 1 thành 'contributor'
 UPDATE user_playlists
 SET role = 'contributor'
 WHERE user_id = 5 AND playlist_id = 1;
@@ -51,9 +52,9 @@ UPDATE payments
 SET payment_status = 'completed',
 WHERE payment_id = 101;
 
--- câu lệnh delete
+-- Câu lệnh DELETE
 
--- xoá 1 lượt like, người dùng có user_id=2 bỏ thích bài hát có song_id = 50
+-- Xoá 1 lượt like, người dùng có user_id=2 bỏ thích bài hát có song_id = 50
 DELETE FROM user_like_songs
 WHERE user_id = 2 AND song_id = 50;
 
@@ -62,17 +63,17 @@ DELETE FROM playlist_songs
 WHERE playlist_id = 1 and song_id = 30
 
 -- Người dùng unfollow 1 nghệ sĩ, 
--- người dùng có user_id = 3 bỏ theo dõi nghệ sĩ có artist_id = 10
+-- Người dùng có user_id = 3 bỏ theo dõi nghệ sĩ có artist_id = 10
 DELETE FROM user_follow_artists
 WHERE user_id = 3 AND artist_id = 10;
 
 -- Người dùng bỏ theo dõi 1 người dùng khác,
--- người dùng có user_id = 4 bỏ theo dõi người dùng có user_id = 5
+-- Người dùng có user_id = 4 bỏ theo dõi người dùng có user_id = 5
 DELETE FROM user_follow_users
 WHERE follower_user_id = 4 AND followed_user_id = 5;
 
--- xoá 1 user, kích hoạt cascade xoá tất cả dữ liệu liên quan,
--- xoá user có user_id = 6
+-- Xoá 1 user, kích hoạt cascade xoá tất cả dữ liệu liên quan,
+-- Xoá user có user_id = 6
 DELETE FROM users
 WHERE user_id = 6;
 
@@ -155,3 +156,159 @@ JOIN playlist_songs ps ON p.playlist_id = ps.playlist_id
 JOIN songs s ON ps.song_id = s.song_id
 GROUP BY p.playlist_name
 ORDER BY tong_thoi_luong DESC;
+
+-- Tính thời lượng trung bình (AVG) của các bài hát theo từng thể loại (genre).
+SELECT
+    g.genre_name,
+    AVG(s.song_duration_seconds) AS thoi_luong_trung_binh
+FROM genres g
+JOIN song_genres sg ON g.genre_id = sg.genre_id
+JOIN songs s ON sg.song_id = s.song_id
+GROUP BY g.genre_name;
+
+-- Tính tổng doanh thu (đã hoàn thành) theo từng gói (plan):
+SELECT
+    pl.plan_name,
+    pl.plan_billing_cycle,
+    SUM(p.payment_amount) AS tong_doanh_thu
+FROM plans pl
+JOIN subscriptions s ON pl.plan_id = s.plan_id
+JOIN payments p ON s.subscription_id = p.subscription_id
+WHERE p.payment_status = 'completed'
+GROUP BY pl.plan_name, pl.plan_billing_cycle;
+
+-- Sử dụng min, max
+-- Tìm lượt nghe cao nhất và thấp nhất cho các bài hát của mỗi nghệ sĩ
+SELECT
+    a.artist_name,
+    MAX(s.song_play_count) AS luot_nghe_cao_nhat,
+    MIN(s.song_play_count) AS luot_nghe_thap_nhat
+FROM artists a
+JOIN song_artists sa ON a.artist_id = sa.artist_id
+JOIN songs s ON sa.song_id = s.song_id
+WHERE sa.role = 'primary'
+GROUP BY a.artist_name;
+
+-- Tìm ngày phát hành album cũ nhất và mới nhất của mỗi nghệ sĩ
+SELECT
+    a.artist_name,
+    MIN(al.album_release_date) AS album_dau_tien,
+    MAX(al.album_release_date) AS album_moi_nhat
+FROM artists a
+JOIN albums al ON a.artist_id = al.artist_id
+GROUP BY a.artist_name;
+
+-- Tìm thời điểm like bài hát đầu tiên và cuối cùng của mỗi người dung
+SELECT
+    u.user_username,
+    MIN(uls.liked_at) AS lan_thich_dau_tien,
+    MAX(uls.liked_at) AS lan_thich_gan_nhat
+FROM users u
+JOIN user_like_songs uls ON u.user_id = uls.user_id
+GROUP BY u.user_username;
+
+-- Sử dụng having
+-- Tìm các nghệ sĩ có hơn 3 album
+SELECT
+    a.artist_name,
+    COUNT(al.album_id) AS so_luong_album
+FROM artists a
+JOIN albums al ON a.artist_id = al.artist_id
+GROUP BY a.artist_name
+HAVING COUNT(al.album_id) > 3;
+
+-- Tìm các bài hát được like bởi hơn 5 người dùng
+SELECT
+    s.song_title,
+    COUNT(uls.user_id) AS so_luot_thich
+FROM songs s
+JOIN user_like_songs uls ON s.song_id = uls.song_id
+GROUP BY s.song_title
+HAVING COUNT(uls.user_id) > 5;
+
+-- Tìm những người dùng đã nghe hơn 20 bài hát khác nhau
+SELECT
+    u.user_username,
+    COUNT(DISTINCT l.listen_song_id) AS so_bai_hat_da_nghe
+FROM users u
+JOIN listens l ON u.user_id = l.listen_user_id
+GROUP BY u.user_username
+HAVING COUNT(DISTINCT l.listen_song_id) > 20;
+
+-- sử dụng IN, NOT IN
+-- Lấy thông tin các bài hát nằm trong các album được phát hành bởi nghệ sĩ "Sơn Tùng M-TP"
+SELECT
+    s.song_title,
+    a.album_title
+FROM songs s
+JOIN albums a ON s.album_id = a.album_id
+WHERE a.artist_id IN (
+    SELECT artist_id FROM artists WHERE artist_name = N'Sơn Tùng M-TP'
+);
+
+-- Tìm tên những người dùng đã like ít nhất 1 bài hát thuộc thể loại "Pop"
+SELECT DISTINCT
+    u.user_username,
+    u.user_email
+FROM users u
+JOIN user_like_songs uls ON u.user_id = uls.user_id
+WHERE uls.song_id IN (
+    SELECT sg.song_id
+    FROM song_genres sg
+    JOIN genres g ON sg.genre_id = g.genre_id
+    WHERE g.genre_name = 'Pop'
+);
+-- Lấy danh sách các album của những nghệ sĩ không đến từ 'VN' (Việt Nam)
+SELECT
+    al.album_title,
+    ar.artist_name
+FROM albums al
+JOIN artists ar ON al.artist_id = ar.artist_id
+WHERE al.artist_id NOT IN (
+    SELECT artist_id FROM artists WHERE artist_country_code = 'VN'
+);
+-- Lấy danh sách người dùng chưa từng nghe bất kỳ bài hát nào của nghệ sĩ "Taylor Swift"
+SELECT
+    u.user_username
+FROM users u
+LEFT JOIN subscriptions s ON u.user_id = s.user_id -- (Join 2 bảng)
+WHERE u.user_id NOT IN (
+    SELECT l.listen_user_id
+    FROM listens l
+    JOIN song_artists sa ON l.listen_song_id = sa.song_id
+    JOIN artists a ON sa.artist_id = a.artist_id
+    WHERE a.artist_name = 'Taylor Swift'
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

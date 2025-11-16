@@ -12,15 +12,23 @@ SET NOCOUNT ON;
 GO
 
 -----------------------------------------------------
--- 1. Bảng plans (Yêu cầu: 3 dòng)
--- Giả sử: Gói tháng = $5, Gói năm = $5 * 12 * 0.85 = $51
+-- 1. Bảng plans (Yêu cầu: 5 dòng)
+-- CẬP NHẬT: Thêm các gói VND
+-- Giả sử: $1 = 25,000 VND
 -----------------------------------------------------
 SET IDENTITY_INSERT plans ON;
-INSERT INTO plans (plan_id, plan_name, plan_is_active, plan_price, plan_billing_cycle, plan_description)
+INSERT INTO plans (plan_id, plan_name, plan_is_active, plan_price, plan_currency, plan_billing_cycle, plan_description)
 VALUES
-(1, N'free', 1, 0.00, 'perpetual', N'Nghe nhạc có quảng cáo, chất lượng tiêu chuẩn.'),
-(2, N'premium', 1, 5.00, 'monthly', N'Gói Premium hàng tháng, không quảng cáo, chất lượng cao.'),
-(3, N'premium', 1, 51.00, 'annually', N'Gói Premium hàng năm (Tiết kiệm 15% so với gói tháng).');
+-- Gói Free (Mặc định VND)
+(1, N'free', 1, 0.00, 'VND', 'perpetual', N'Nghe nhạc có quảng cáo, chất lượng tiêu chuẩn.'),
+
+-- Gói Premium USD
+(2, N'premium', 1, 5.00, 'USD', 'monthly', N'Gói Premium hàng tháng (USD), không quảng cáo.'),
+(3, N'premium', 1, 51.00, 'USD', 'annually', N'Gói Premium hàng năm (USD) (Tiết kiệm 15%).'),
+
+-- Gói Premium VND (Tương đương)
+(4, N'premium', 1, 125000.00, 'VND', 'monthly', N'Gói Premium hàng tháng (VND), không quảng cáo.'),
+(5, N'premium', 1, 1275000.00, 'VND', 'annually', N'Gói Premium hàng năm (VND) (Tiết kiệm 15%).');
 SET IDENTITY_INSERT plans OFF;
 GO
 
@@ -49,8 +57,8 @@ VALUES
 (16, 'khanh_user', 'khanh@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Trắng Khánh', N'Lisa', 'https://example.com/avatars/khanh.png', 'khanh bio', 'VN', 'user'),
 (17, 'bich_user', 'bich@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Trần Thị Bích', N'Mike', 'https://example.com/avatars/bich.png', 'bich bio', 'VN', 'user'),
 (18, 'anhthu_user', 'anhthu@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Anh Thư', N'Nina', 'https://example.com/avatars/anhthu.png', 'anhthu bio', 'VN', 'user'),
-(19, 'huy_user', 'huy@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Huy', N'Oscar', 'https://example.com/avatars/huy.png', 'huy bio', 'VN', 'user'),
-(20, 'khiem_user', 'khiem@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Khiêm', N'Paul', 'https://example.com/avatars/khiem.png', 'khiem bio', 'VN', 'user');
+(19, 'ronaldo_user', 'ronaldo@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Cristiano Ronaldo', N'CR7', 'https://example.com/avatars/ronaldo.png', 'ronaldo bio', 'US', 'user'),
+(20, 'melody_mark_user', 'melodymark@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Melody Mark', N'Melody', 'https://example.com/avatars/melodymark.png', 'melodymark bio', 'US', 'user');
 SET IDENTITY_INSERT users OFF;
 GO
 
@@ -154,65 +162,65 @@ SET IDENTITY_INSERT songs ON;
 INSERT INTO songs (song_id, song_title, song_release_date, song_duration_seconds, song_description, song_audio_url,song_cover_url, album_id, song_play_count, song_is_explicit)
 VALUES
 -- Album 101 (Sơn Tùng M-TP)
-(1001, N'Lạc Trôi', '2017-01-01', 245, 'Bài hát Lạc Trôi của Sơn Tùng M-TP', 'http://audio.com/s1001.mp3', 'https://example.com/songs/lac_troi.png', 101, 0, 0),
-(1002, N'Nơi Này Có Anh', '2017-02-14', 260, 'Bài hát Nơi Này Có Anh của Sơn Tùng M-TP', 'http://audio.com/s1002.mp3', 'https://example.com/songs/noi_nay_co_anh.png', 101, 0, 0),
+(1001, N'Lạc Trôi', '2017-01-01', 245, N'Bài hát Lạc Trôi của Sơn Tùng M-TP', 'http://audio.com/s1001.mp3', 'https://example.com/songs/lac_troi.png', 101, 0, 0),
+(1002, N'Nơi Này Có Anh', '2017-02-14', 260, N'Bài hát Nơi Này Có Anh của Sơn Tùng M-TP', 'http://audio.com/s1002.mp3', 'https://example.com/songs/noi_nay_co_anh.png', 101, 0, 0),
 -- Album 102 (Taylor Swift)
-(1003, N'Look What You Made Me Do', '2017-08-24', 211, 'Bài hát Look What You Made Me Do của Taylor Swift', 'http://audio.com/s1003.mp3', 'https://example.com/songs/look_what_you_made_me_do.png', 102, 0, 1),
-(1004, N'Delicate', '2018-03-12', 232, 'Bài hát Delicate của Taylor Swift', 'http://audio.com/s1004.mp3', 'https://example.com/songs/delicate.png', 102, 0, 0),
+(1003, N'Look What You Made Me Do', '2017-08-24', 211, N'Bài hát Look What You Made Me Do của Taylor Swift', 'http://audio.com/s1003.mp3', 'https://example.com/songs/look_what_you_made_me_do.png', 102, 0, 1),
+(1004, N'Delicate', '2018-03-12', 232, N'Bài hát Delicate của Taylor Swift', 'http://audio.com/s1004.mp3', 'https://example.com/songs/delicate.png', 102, 0, 0),
 -- Album 103 (Adele)
-(1005, N'Easy on Me', '2021-10-15', 224, 'Bài hát Easy on Me của Adele', 'http://audio.com/s1005.mp3', 'https://example.com/songs/easy_on_me.png', 103, 0, 0),
-(1006, N'Oh My God', '2021-11-19', 225, 'Bài hát Oh My God của Adele', 'http://audio.com/s1006.mp3', 'https://example.com/songs/oh_my_god.png', 103, 0, 0),
+(1005, N'Easy on Me', '2021-10-15', 224, N'Bài hát Easy on Me của Adele', 'http://audio.com/s1005.mp3', 'https://example.com/songs/easy_on_me.png', 103, 0, 0),
+(1006, N'Oh My God', '2021-11-19', 225, N'Bài hát Oh My God của Adele', 'http://audio.com/s1006.mp3', 'https://example.com/songs/oh_my_god.png', 103, 0, 0),
 -- Album 104 (BTS)
-(1007, N'Boy With Luv', '2019-04-12', 229, 'Bài hát Boy With Luv của BTS', 'http://audio.com/s1007.mp3', 'https://example.com/songs/boy_with_luv.png', 104, 0, 0),
-(1008, N'ON', '2020-02-21', 246, 'Bài hát ON của BTS', 'http://audio.com/s1008.mp3', 'https://example.com/songs/on.png', 104, 0, 0),
+(1007, N'Boy With Luv', '2019-04-12', 229, N'Bài hát Boy With Luv của BTS', 'http://audio.com/s1007.mp3', 'https://example.com/songs/boy_with_luv.png', 104, 0, 0),
+(1008, N'ON', '2020-02-21', 246, N'Bài hát ON của BTS', 'http://audio.com/s1008.mp3', 'https://example.com/songs/on.png', 104, 0, 0),
 -- Album 105 (BLACKPINK)
-(1009, N'How You Like That', '2020-06-26', 181, 'Bài hát How You Like That của BLACKPINK', 'http://audio.com/s1009.mp3', 'https://example.com/songs/how_you_like_that.png', 105, 0, 0),
-(1010, N'Lovesick Girls', '2020-10-02', 192, 'Bài hát Lovesick Girls của BLACKPINK', 'http://audio.com/s1010.mp3', 'https://example.com/songs/lovesick_girls.png', 105, 0, 0),
+(1009, N'How You Like That', '2020-06-26', 181, N'Bài hát How You Like That của BLACKPINK', 'http://audio.com/s1009.mp3', 'https://example.com/songs/how_you_like_that.png', 105, 0, 0),
+(1010, N'Lovesick Girls', '2020-10-02', 192, N'Bài hát Lovesick Girls của BLACKPINK', 'http://audio.com/s1010.mp3', 'https://example.com/songs/lovesick_girls.png', 105, 0, 0),
 -- Album 106 (Ed Sheeran)
-(1011, N'Shape of You', '2017-01-06', 233, 'Bài hát Shape of You của Ed Sheeran', 'http://audio.com/s1011.mp3', 'https://example.com/songs/shape_of_you.png', 106, 0, 0),
-(1012, N'Perfect', '2017-09-26', 263, 'Bài hát Perfect của Ed Sheeran', 'http://audio.com/s1012.mp3', 'https://example.com/songs/perfect.png', 106, 0, 0),
+(1011, N'Shape of You', '2017-01-06', 233, N'Bài hát Shape of You của Ed Sheeran', 'http://audio.com/s1011.mp3', 'https://example.com/songs/shape_of_you.png', 106, 0, 0),
+(1012, N'Perfect', '2017-09-26', 263, N'Bài hát Perfect của Ed Sheeran', 'http://audio.com/s1012.mp3', 'https://example.com/songs/perfect.png', 106, 0, 0),
 -- Album 107 (Ariana Grande)
-(1013, N'7 rings', '2019-01-18', 178, 'Bài hát 7 rings của Ariana Grande', 'http://audio.com/s1013.mp3', 'https://example.com/songs/7_rings.png', 107, 0, 1),
-(1014, N'thank u, next', '2018-11-03', 207, 'Bài hát thank u, next của Ariana Grande', 'http://audio.com/s1014.mp3', 'https://example.com/songs/thank_u_next.png', 107, 0, 1),
+(1013, N'7 rings', '2019-01-18', 178, N'Bài hát 7 rings của Ariana Grande', 'http://audio.com/s1013.mp3', 'https://example.com/songs/7_rings.png', 107, 0, 1),
+(1014, N'thank u, next', '2018-11-03', 207, N'Bài hát thank u, next của Ariana Grande', 'http://audio.com/s1014.mp3', 'https://example.com/songs/thank_u_next.png', 107, 0, 1),
 -- Album 108 (The Weeknd)
-(1015, N'Blinding Lights', '2019-11-29', 200, 'Bài hát Blinding Lights của The Weeknd', 'http://audio.com/s1015.mp3', 'https://example.com/songs/blinding_lights.png', 108, 0, 0),
-(1016, N'Save Your Tears', '2020-08-09', 215, 'Bài hát Save Your Tears của The Weeknd', 'http://audio.com/s1016.mp3', 'https://example.com/songs/save_your_tears.png', 108, 0, 0),
+(1015, N'Blinding Lights', '2019-11-29', 200, N'Bài hát Blinding Lights của The Weeknd', 'http://audio.com/s1015.mp3', 'https://example.com/songs/blinding_lights.png', 108, 0, 0),
+(1016, N'Save Your Tears', '2020-08-09', 215, N'Bài hát Save Your Tears của The Weeknd', 'http://audio.com/s1016.mp3', 'https://example.com/songs/save_your_tears.png', 108, 0, 0),
 -- Album 109 (Drake)
-(1017, N'God''s Plan', '2018-01-19', 198, 'Bài hát God''s Plan của Drake', 'http://audio.com/s1017.mp3', 'https://example.com/songs/gods_plan.png', 109, 0, 1),
-(1018, N'In My Feelings', '2018-07-10', 217, 'Bài hát In My Feelings của Drake', 'http://audio.com/s1018.mp3', 'https://example.com/songs/in_my_feelings.png', 109, 0, 1),
+(1017, N'God''s Plan', '2018-01-19', 198, N'Bài hát God''s Plan của Drake', 'http://audio.com/s1017.mp3', 'https://example.com/songs/gods_plan.png', 109, 0, 1),
+(1018, N'In My Feelings', '2018-07-10', 217, N'Bài hát In My Feelings của Drake', 'http://audio.com/s1018.mp3', 'https://example.com/songs/in_my_feelings.png', 109, 0, 1),
 -- Album 110 (Billie Eilish)
-(1019, N'bad guy', '2019-03-29', 194, 'Bài hát bad guy của Billie Eilish', 'http://audio.com/s1019.mp3', 'https://example.com/songs/bad_guy.png', 110, 0, 0),
-(1020, N'when the party''s over', '2018-10-17', 196, 'Bài hát when the party''s over của Billie Eilish', 'http://audio.com/s1020.mp3', 'https://example.com/songs/when_the_partys_over.png', 110, 0, 0),
+(1019, N'bad guy', '2019-03-29', 194, N'Bài hát bad guy của Billie Eilish', 'http://audio.com/s1019.mp3', 'https://example.com/songs/bad_guy.png', 110, 0, 0),
+(1020, N'when the party''s over', '2018-10-17', 196, N'Bài hát when the party''s over của Billie Eilish', 'http://audio.com/s1020.mp3', 'https://example.com/songs/when_the_partys_over.png', 110, 0, 0),
 -- Album 111 (Hà Anh Tuấn)
-(1021, N'Tháng Mấy Em Nhớ Anh?', '2016-12-20', 300, 'Bài hát Tháng Mấy Em Nhớ Anh? của Hà Anh Tuấn', 'http://audio.com/s1021.mp3', 'https://example.com/songs/thang_may_em_nho_anh.png', 111, 0, 0),
-(1022, N'Người Tình Mùa Đông', '2016-12-20', 280, 'Bài hát Người Tình Mùa Đông của Hà Anh Tuấn', 'http://audio.com/s1022.mp3', 'https://example.com/songs/nguoi_tinh_mua_dong.png', 111, 0, 0),
+(1021, N'Tháng Mấy Em Nhớ Anh?', '2016-12-20', 300, N'Bài hát Tháng Mấy Em Nhớ Anh? của Hà Anh Tuấn', 'http://audio.com/s1021.mp3', 'https://example.com/songs/thang_may_em_nho_anh.png', 111, 0, 0),
+(1022, N'Người Tình Mùa Đông', '2016-12-20', 280, N'Bài hát Người Tình Mùa Đông của Hà Anh Tuấn', 'http://audio.com/s1022.mp3', 'https://example.com/songs/nguoi_tinh_mua_dong.png', 111, 0, 0),
 -- Album 112 (Vũ Cát Tường)
-(1023, N'Vài Lần Đón Đưa', '2017-10-27', 250, 'Bài hát Vài Lần Đón Đưa của Vũ Cát Tường', 'http://audio.com/s1023.mp3', 'https://example.com/songs/vai_lan_don_dua.png', 112, 0, 0),
-(1024, N'Mơ', '2016-12-16', 230, 'Bài hát Mơ của Vũ Cát Tường', 'http://audio.com/s1024.mp3', 'https://example.com/songs/mo.png', 112, 0, 0),
+(1023, N'Vài Lần Đón Đưa', '2017-10-27', 250, N'Bài hát Vài Lần Đón Đưa của Vũ Cát Tường', 'http://audio.com/s1023.mp3', 'https://example.com/songs/vai_lan_don_dua.png', 112, 0, 0),
+(1024, N'Mơ', '2016-12-16', 230, N'Bài hát Mơ của Vũ Cát Tường', 'http://audio.com/s1024.mp3', 'https://example.com/songs/mo.png', 112, 0, 0),
 -- Album 113 (Mỹ Tâm)
-(1025, N'Người Hãy Quên Em Đi', '2017-12-03', 225, 'Bài hát Người Hãy Quên Em Đi của Mỹ Tâm', 'http://audio.com/s1025.mp3', 'https://example.com/songs/nguoi_hay_quen_em_di.png', 113, 0, 0),
-(1026, N'Đâu Chỉ Riêng Em', '2017-07-17', 240, 'Bài hát Đâu Chỉ Riêng Em của Mỹ Tâm', 'http://audio.com/s1026.mp3', 'https://example.com/songs/dau_chi_rieng_em.png', 113, 0, 0),
+(1025, N'Người Hãy Quên Em Đi', '2017-12-03', 225, N'Bài hát Người Hãy Quên Em Đi của Mỹ Tâm', 'http://audio.com/s1025.mp3', 'https://example.com/songs/nguoi_hay_quen_em_di.png', 113, 0, 0),
+(1026, N'Đâu Chỉ Riêng Em', '2017-07-17', 240, N'Bài hát Đâu Chỉ Riêng Em của Mỹ Tâm', 'http://audio.com/s1026.mp3', 'https://example.com/songs/dau_chi_rieng_em.png', 113, 0, 0),
 -- Album 114 (Đen Vâu)
-(1027, N'Lối Nhỏ', '2019-10-20', 300, 'Bài hát Lối Nhỏ của Đen Vâu', 'http://audio.com/s1027.mp3', 'https://example.com/songs/loi_nho.png', 114, 0, 0),
-(1028, N'Bài Này Chill Phết', '2019-05-23', 280, 'Bài hát Bài Này Chill Phết của Đen Vâu', 'http://audio.com/s1028.mp3', 'https://example.com/songs/bai_nay_chill_phet.png', 114, 0, 0),
+(1027, N'Lối Nhỏ', '2019-10-20', 300, N'Bài hát Lối Nhỏ của Đen Vâu', 'http://audio.com/s1027.mp3', 'https://example.com/songs/loi_nho.png', 114, 0, 0),
+(1028, N'Bài Này Chill Phết', '2019-05-23', 280, N'Bài hát Bài Này Chill Phết của Đen Vâu', 'http://audio.com/s1028.mp3', 'https://example.com/songs/bai_nay_chill_phet.png', 114, 0, 0),
 -- Album 115 (Michael Jackson)
-(1029, N'Billie Jean', '1983-01-02', 294, 'Bài hát Billie Jean của Michael Jackson', 'http://audio.com/s1029.mp3', 'https://example.com/songs/billie_jean.png', 115, 0, 0),
-(1030, N'Thriller', '1983-11-12', 357, 'Bài hát Thriller của Michael Jackson', 'http://audio.com/s1030.mp3', 'https://example.com/songs/thriller.png', 115, 0, 0),
+(1029, N'Billie Jean', '1983-01-02', 294, N'Bài hát Billie Jean của Michael Jackson', 'http://audio.com/s1029.mp3', 'https://example.com/songs/billie_jean.png', 115, 0, 0),
+(1030, N'Thriller', '1983-11-12', 357, N'Bài hát Thriller của Michael Jackson', 'http://audio.com/s1030.mp3', 'https://example.com/songs/thriller.png', 115, 0, 0),
 -- Album 116 (Hoàng Thùy Linh)
-(1031, N'Để Mị Nói Cho Mà Nghe', '2019-06-19', 200, 'Bài hát Để Mị Nói Cho Mà Nghe của Hoàng Thùy Linh', 'http://audio.com/s1031.mp3', 'https://example.com/songs/de_mi_noi_cho_ma_nghe.png', 116, 0, 0),
-(1032, N'Tứ Phủ', '2019-08-16', 220, 'Bài hát Tứ Phủ của Hoàng Thùy Linh', 'http://audio.com/s1032.mp3', 'https://example.com/songs/tu_phu.png', 116, 0, 0),
+(1031, N'Để Mị Nói Cho Mà Nghe', '2019-06-19', 200, N'Bài hát Để Mị Nói Cho Mà Nghe của Hoàng Thùy Linh', 'http://audio.com/s1031.mp3', 'https://example.com/songs/de_mi_noi_cho_ma_nghe.png', 116, 0, 0),
+(1032, N'Tứ Phủ', '2019-08-16', 220, N'Bài hát Tứ Phủ của Hoàng Thùy Linh', 'http://audio.com/s1032.mp3', 'https://example.com/songs/tu_phu.png', 116, 0, 0),
 -- Album 117 (Bích Phương)
-(1033, N'Bùa Yêu', '2018-05-12', 240, 'Bài hát Bùa Yêu của Bích Phương', 'http://audio.com/s1033.mp3', 'https://example.com/songs/bua_yeu.png', 117, 0, 0),
-(1034, N'Chị Ngả Em Nâng', '2018-11-21', 230, 'Bài hát Chị Ngả Em Nâng của Bích Phương', 'http://audio.com/s1034.mp3', 'https://example.com/songs/chi_nga_em_nang.png', 117, 0, 0),
+(1033, N'Bùa Yêu', '2018-05-12', 240, N'Bài hát Bùa Yêu của Bích Phương', 'http://audio.com/s1033.mp3', 'https://example.com/songs/bua_yeu.png', 117, 0, 0),
+(1034, N'Chị Ngả Em Nâng', '2018-11-21', 230, N'Bài hát Chị Ngả Em Nâng của Bích Phương', 'http://audio.com/s1034.mp3', 'https://example.com/songs/chi_nga_em_nang.png', 117, 0, 0),
 -- Album 118 (Soobin)
-(1035, N'Trò Chơi', '2020-11-21', 215, 'Bài hát Trò Chơi của Soobin', 'http://audio.com/s1035.mp3', 'https://example.com/songs/tro_choi.png', 118, 0, 0),
-(1036, N'BlackJack', '2020-12-15', 230, 'Bài hát BlackJack của Soobin', 'http://audio.com/s1036.mp3', 'https://example.com/songs/blackjack.png', 118, 0, 1),
+(1035, N'Trò Chơi', '2020-11-21', 215, N'Bài hát Trò Chơi của Soobin', 'http://audio.com/s1035.mp3', 'https://example.com/songs/tro_choi.png', 118, 0, 0),
+(1036, N'BlackJack', '2020-12-15', 230, N'Bài hát BlackJack của Soobin', 'http://audio.com/s1036.mp3', 'https://example.com/songs/blackjack.png', 118, 0, 1),
 -- Album 119 (Jack (J97))
-(1037, N'Sóng Gió', '2019-07-12', 250, 'Bài hát Sóng Gió của Jack (J97)', 'http://audio.com/s1037.mp3', 'https://example.com/songs/song_gio.png', 119, 0, 0),
-(1038, N'Bạc Phận', '2019-04-16', 270, 'Bài hát Bạc Phận của Jack (J97)', 'http://audio.com/s1038.mp3', 'https://example.com/songs/bac_phan.png', 119, 0, 0),
+(1037, N'Sóng Gió', '2019-07-12', 250, N'Bài hát Sóng Gió của Jack (J97)', 'http://audio.com/s1037.mp3', 'https://example.com/songs/song_gio.png', 119, 0, 0),
+(1038, N'Bạc Phận', '2019-04-16', 270, N'Bài hát Bạc Phận của Jack (J97)', 'http://audio.com/s1038.mp3', 'https://example.com/songs/bac_phan.png', 119, 0, 0),
 -- Album 120 (Hồ Ngọc Hà)
-(1039, N'Cả Một Trời Thương Nhớ', '2017-08-25', 280, 'Bài hát Cả Một Trời Thương Nhớ của Hồ Ngọc Hà', 'http://audio.com/s1039.mp3', 'https://example.com/songs/ca_mot_troi_thuong_nho.png', 120, 0, 0),
-(1040, N'Gửi Người Yêu Cũ', '2016-10-24', 290, 'Bài hát Gửi Người Yêu Cũ của Hồ Ngọc Hà', 'http://audio.com/s1040.mp3', 'https://example.com/songs/gui_nguoi_yeu_cu.png', 120, 0, 0);
+(1039, N'Cả Một Trời Thương Nhớ', '2017-08-25', 280, N'Bài hát Cả Một Trời Thương Nhớ của Hồ Ngọc Hà', 'http://audio.com/s1039.mp3', 'https://example.com/songs/ca_mot_troi_thuong_nho.png', 120, 0, 0),
+(1040, N'Gửi Người Yêu Cũ', '2016-10-24', 290, N'Bài hát Gửi Người Yêu Cũ của Hồ Ngọc Hà', 'http://audio.com/s1040.mp3', 'https://example.com/songs/gui_nguoi_yeu_cu.png', 120, 0, 0);
 SET IDENTITY_INSERT songs OFF;
 GO
 
