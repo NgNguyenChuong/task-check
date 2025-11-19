@@ -32,33 +32,42 @@ VALUES
 SET IDENTITY_INSERT plans OFF;
 GO
 
+SET IDENTITY_INSERT plans ON;
+INSERT INTO plans (plan_id, plan_name, plan_is_active, plan_price, plan_currency, plan_billing_cycle, plan_description, plan_deleted_at)
+VALUES(6, N'premium', 1, 200000.00, 'VD', 'monthly', N'Gói Gia đình hàng tháng (VND), cho phép 6 tài khoản.', GETDATE());
+SET IDENTITY_INSERT plans OFF;
+GO
+
+
+
 -----------------------------------------------------
 -- 2. Bảng users (Yêu cầu: 20 dòng)
 -----------------------------------------------------
 -- password : 12345 -> 8cb2237d0679ca88db6464eac60da96345513964 (SHA1)
+
 SET IDENTITY_INSERT users ON;
-INSERT INTO users (user_id, user_username, user_email, user_password_hash, user_fullname, user_display_name, user_avatar_url, user_bio, user_country_code, user_role)
+INSERT INTO users (user_id, user_username, user_email, user_password_hash, user_fullname, user_display_name, user_avatar_url, user_bio, user_country_code, user_role, user_date_of_birth)
 VALUES
-(1, 'admin_user', 'admin@music.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Admin Manager', N'Admin', 'https://example.com/avatars/admin.png', 'Admin bio', 'VN', 'admin'),
-(2, 'artist_son_tung', 'sontung@music.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Thanh Tùng', N'Sơn Tùng M-TP', 'https://example.com/avatars/sontung.png', 'Sơn Tùng M-TP bio', 'VN', 'artist'),
-(3, 'artist_taylor', 'taylor@music.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Taylor Swift', N'Taylor Swift', 'https://example.com/avatars/taylor.png','Taylor Swift bio', 'US', 'artist'),
-(4, 'artist_adele', 'adele@music.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Adele Adkins', N'Adele', 'https://example.com/avatars/adele.png','Adele bio', 'US', 'artist'),
-(5, 'chuong_user', 'chuong@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Nguyên Chương', N'Alice', 'https://example.com/avatars/chuong.png', 'chuong bio', 'VN', 'user'),
-(6, 'phong_user', 'phong@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Phạm Thanh Phong', N'Bob', 'https://example.com/avatars/phong.png', 'phong bio', 'VN', 'user'),
-(7, 'quoc_user', 'quoc@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Văn Quốc', N'Charlie', 'https://example.com/avatars/quoc.png', 'quoc bio', 'VN', 'user'),
-(8, 'thu_user', 'thu@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Lê Phương Anh Thư', N'David', 'https://example.com/avatars/thu.png', 'thu bio', 'VN', 'user'),
-(9, 'duy_user', 'duy@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Duy', N'Eva', 'https://example.com/avatars/duy.png', 'duy bio', 'VN', 'user'),
-(10, 'sang_user', 'sang@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Văn Sang', N'Frank', 'https://example.com/avatars/sang.png', 'sang bio', 'VN', 'user'),
-(11, 'tu_user', 'tu@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Thị Tú', N'Grace', 'https://example.com/avatars/tu.png', 'tu bio', 'VN', 'user'),
-(12, 'van_user', 'van@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Thị Vân', N'Hannah', 'https://example.com/avatars/van.png', 'van bio', 'VN', 'user'),
-(13, 'khoa_user', 'khoa@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Trần Đăng Khoa', N'Ivan', 'https://example.com/avatars/khoa.png', 'khoa bio', 'VN', 'user'),
-(14, 'quyen_user', 'quyen@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Thị Quyến', N'Judy', 'https://example.com/avatars/quyen.png', 'quyen bio', 'VN', 'user'),
-(15, 'dat_user', 'dat@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Đình Đạt', N'Kyle', 'https://example.com/avatars/dat.png', 'dat bio', 'VN', 'user'),
-(16, 'khanh_user', 'khanh@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Trắng Khánh', N'Lisa', 'https://example.com/avatars/khanh.png', 'khanh bio', 'VN', 'user'),
-(17, 'bich_user', 'bich@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Trần Thị Bích', N'Mike', 'https://example.com/avatars/bich.png', 'bich bio', 'VN', 'user'),
-(18, 'anhthu_user', 'anhthu@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Anh Thư', N'Nina', 'https://example.com/avatars/anhthu.png', 'anhthu bio', 'VN', 'user'),
-(19, 'ronaldo_user', 'ronaldo@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Cristiano Ronaldo', N'CR7', 'https://example.com/avatars/ronaldo.png', 'ronaldo bio', 'US', 'user'),
-(20, 'melody_mark_user', 'melodymark@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Melody Mark', N'Melody', 'https://example.com/avatars/melodymark.png', 'melodymark bio', 'US', 'user');
+(1, 'admin_user', 'admin@music.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Admin Manager', N'Admin', 'https://example.com/avatars/admin.png', 'Admin bio', 'VN', 'admin', '1990-01-01'),
+(2, 'artist_son_tung', 'sontung@music.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Thanh Tùng', N'Sơn Tùng M-TP', 'https://example.com/avatars/sontung.png', 'Sơn Tùng M-TP bio', 'VN', 'artist', '1994-07-05'),
+(3, 'artist_taylor', 'taylor@music.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Taylor Swift', N'Taylor Swift', 'https://example.com/avatars/taylor.png','Taylor Swift bio', 'US', 'artist', '1989-12-13'),
+(4, 'artist_adele', 'adele@music.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Adele Adkins', N'Adele', 'https://example.com/avatars/adele.png','Adele bio', 'US', 'artist', '1988-05-05'),
+(5, 'chuong_user', 'chuong@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Nguyên Chương', N'Alice', 'https://example.com/avatars/chuong.png', 'chuong bio', 'VN', 'user', '2001-05-20'),
+(6, 'phong_user', 'phong@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Phạm Thanh Phong', N'Bob', 'https://example.com/avatars/phong.png', 'phong bio', 'VN', 'user', '2000-08-15'),
+(7, 'quoc_user', 'quoc@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Văn Quốc', N'Charlie', 'https://example.com/avatars/quoc.png', 'quoc bio', 'VN', 'user', '1999-02-28'),
+(8, 'thu_user', 'thu@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Lê Phương Anh Thư', N'David', 'https://example.com/avatars/thu.png', 'thu bio', 'VN', 'user', '2002-11-10'),
+(9, 'duy_user', 'duy@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Duy', N'Eva', 'https://example.com/avatars/duy.png', 'duy bio', 'VN', 'user', '1998-03-12'),
+(10, 'sang_user', 'sang@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Văn Sang', N'Frank', 'https://example.com/avatars/sang.png', 'sang bio', 'VN', 'user', '1997-09-09'),
+(11, 'tu_user', 'tu@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Thị Tú', N'Grace', 'https://example.com/avatars/tu.png', 'tu bio', 'VN', 'user', '2003-07-25'),
+(12, 'van_user', 'van@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Thị Vân', N'Hannah', 'https://example.com/avatars/van.png', 'van bio', 'VN', 'user', '1996-04-30'),
+(13, 'khoa_user', 'khoa@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Trần Đăng Khoa', N'Ivan', 'https://example.com/avatars/khoa.png', 'khoa bio', 'VN', 'user', '2000-12-01'),
+(14, 'quyen_user', 'quyen@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Thị Quyến', N'Judy', 'https://example.com/avatars/quyen.png', 'quyen bio', 'VN', 'user', '2001-06-18'),
+(15, 'dat_user', 'dat@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Đình Đạt', N'Kyle', 'https://example.com/avatars/dat.png', 'dat bio', 'VN', 'user', '1999-10-20'),
+(16, 'khanh_user', 'khanh@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Trắng Khánh', N'Lisa', 'https://example.com/avatars/khanh.png', 'khanh bio', 'VN', 'user', '2002-01-15'),
+(17, 'bich_user', 'bich@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Trần Thị Bích', N'Mike', 'https://example.com/avatars/bich.png', 'bich bio', 'VN', 'user', '1998-08-08'),
+(18, 'anhthu_user', 'anhthu@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Nguyễn Anh Thư', N'Nina', 'https://example.com/avatars/anhthu.png', 'anhthu bio', 'VN', 'user', '2004-03-03'),
+(19, 'ronaldo_user', 'ronaldo@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Cristiano Ronaldo', N'CR7', 'https://example.com/avatars/ronaldo.png', 'ronaldo bio', 'US', 'user', '1985-02-05'),
+(20, 'melody_mark_user', 'melodymark@example.com', '8cb2237d0679ca88db6464eac60da96345513964', N'Melody Mark', N'Melody', 'https://example.com/avatars/melodymark.png', 'melodymark bio', 'US', 'user', '1995-05-15');
 SET IDENTITY_INSERT users OFF;
 GO
 
@@ -87,7 +96,8 @@ VALUES
 ('token_hash_17', DATEADD(day, 60, GETDATE()), 'Windows PC', 17, 0, '192.168.1.5'),
 ('token_hash_18', DATEADD(day, 7, GETDATE()), 'iOS App 1.3.0', 18, 0, '203.0.113.45'),
 ('token_hash_19', DATEADD(day, 30, GETDATE()), 'Android Tablet', 19, 0, '198.51.100.50'),
-('token_hash_20', DATEADD(day, 1, GETDATE()), 'Mac Mini', 20, 0, '203.0.113.51');
+('token_hash_20', DATEADD(day, 1, GETDATE()), 'Mac Mini', 20, 0, '203.0.113.51'),
+('token_hash_21', DATEADD(day, 15, GETDATE()), 'Linux Desktop', 1, 0, '192.168.1.6');
 GO
 
 -----------------------------------------------------
@@ -125,28 +135,30 @@ GO
 -- Tương ứng với 20 nghệ sĩ đầu tiên (ID 1-20)
 -----------------------------------------------------
 SET IDENTITY_INSERT albums ON;
-INSERT INTO albums (album_id, album_title, album_release_date, album_cover_url, artist_id)
+
+INSERT INTO albums (album_id, album_title, album_release_date, album_cover_url, artist_id, album_description)
 VALUES
-(101, N'm-tp', '2017-04-01', 'https://example.com/albums/m-tp.png', 1),
-(102, N'Reputation', '2017-11-10', 'https://example.com/albums/reputation.png', 2),
-(103, N'30', '2021-11-19', 'https://example.com/albums/30.png', 3),
-(104, N'Map of the Soul: 7', '2020-02-21', 'https://example.com/albums/map_of_the_soul_7.png', 4),
-(105, N'The Album', '2020-10-02', 'https://example.com/albums/the_album.png', 5),
-(106, N'÷ (Divide)', '2017-03-03', 'https://example.com/albums/divide.png', 6),
-(107, N'Thank U, Next', '2019-02-08', 'https://example.com/albums/thank_u_next.png', 7),
-(108, N'After Hours', '2020-03-20', 'https://example.com/albums/after_hours.png', 8),
-(109, N'Scorpion', '2018-06-29', 'https://example.com/albums/scorpion.png', 9),
-(110, N'When We All Fall Asleep, Where Do We Go?', '2019-03-29', 'https://example.com/albums/when_we_all_fall_asleep.png', 10),
-(111, N'See Sing Share', '2016-12-20', 'https://example.com/albums/see_sing_share.png', 11),
-(112, N'Stardom', '2017-10-27', 'https://example.com/albums/stardom.png', 12),
-(113, N'Tâm 9', '2017-12-03', 'https://example.com/albums/tam_9.png', 13),
-(114, N'Lối Nhỏ (Tuyển tập)', '2020-11-20', 'https://example.com/albums/loi_nho.png', 14),
-(115, N'Thriller', '1982-11-30', 'https://example.com/albums/thriller.png', 15),
-(116, N'Hoàng', '2019-10-20', 'https://example.com/albums/hoang.png', 16),
-(117, N'Dramatic', '2018-12-21', 'https://example.com/albums/dramatic.png', 17),
-(118, N'The Playah', '2020-12-15', 'https://example.com/albums/the_playah.png', 18),
-(119, N'Sóng Gió (Tuyển tập)', '2019-12-20', 'https://example.com/albums/song_gio.png', 19),
-(120, N'Love Songs Collection', '2014-09-15', 'https://example.com/albums/love_songs_collection.png', 20);
+(101, N'm-tp M-TP', '2017-04-01', 'https://example.com/albums/m-tp.png', 1, N'Album tuyển tập đầu tiên đánh dấu chặng đường 5 năm hoạt động nghệ thuật đầy bùng nổ của Sơn Tùng M-TP.'),
+(102, N'Reputation', '2017-11-10', 'https://example.com/albums/reputation.png', 2, N'Album phòng thu thứ sáu với màu sắc tăm tối và mạnh mẽ, đánh dấu sự lột xác hoàn toàn của Taylor Swift.'),
+(103, N'30', '2021-11-19', 'https://example.com/albums/30.png', 3, N'Tuyệt phẩm ballad kể về những tổn thương, sự chữa lành và trưởng thành của Adele sau cuộc ly hôn.'),
+(104, N'Map of the Soul: 7', '2020-02-21', 'https://example.com/albums/map_of_the_soul_7.png', 4, N'Album kỷ niệm 7 năm hoạt động của BTS, khám phá hành trình tìm kiếm bản ngã và cái bóng của sự nổi tiếng.'),
+(105, N'The Album', '2020-10-02', 'https://example.com/albums/the_album.png', 5, N'Album phòng thu tiếng Hàn đầu tiên của BLACKPINK, hội tụ đủ các sắc thái từ mạnh mẽ đến ngọt ngào.'),
+(106, N'÷ (Divide)', '2017-03-03', 'https://example.com/albums/divide.png', 6, N'Album pop ballad đình đám của Ed Sheeran với những bản hit toàn cầu như Shape of You và Perfect.'),
+(107, N'Thank U, Next', '2019-02-08', 'https://example.com/albums/thank_u_next.png', 7, N'Album mang đậm màu sắc R&B/Pop, thể hiện sự độc lập và tự tin của Ariana Grande sau những biến cố tình cảm.'),
+(108, N'After Hours', '2020-03-20', 'https://example.com/albums/after_hours.png', 8, N'Một hành trình âm nhạc ảo diệu kết hợp giữa New Wave và R&B, kể về sự cô đơn và hối tiếc lúc nửa đêm.'),
+(109, N'Scorpion', '2018-06-29', 'https://example.com/albums/scorpion.png', 9, N'Album kép khổng lồ của Drake, khẳng định vị thế thống trị của anh trong làng nhạc Hip-hop đương đại.'),
+(110, N'When We All Fall Asleep, Where Do We Go?', '2019-03-29', 'https://example.com/albums/when_we_all_fall_asleep.png', 10, N'Album debut đầy ma mị và phá cách, định hình phong cách "pop u tối" độc đáo của Billie Eilish.'),
+(111, N'See Sing Share', '2016-12-20', 'https://example.com/albums/see_sing_share.png', 11, N'Dự án cover acoustic mộc mạc nhưng đầy cảm xúc, làm sống lại những bản tình ca vàng son một thời.'),
+(112, N'Stardom', '2017-10-27', 'https://example.com/albums/stardom.png', 12, N'Album đánh dấu sự trưởng thành của Vũ Cát Tường với khả năng sáng tác đa dạng và giọng hát nội lực.'),
+(113, N'Tâm 9', '2017-12-03', 'https://example.com/albums/tam_9.png', 13, N'Tuyệt phẩm Soul/Pop khẳng định đẳng cấp của Mỹ Tâm, đạt top 10 Billboard World Albums.'),
+(114, N'Lối Nhỏ (Tuyển tập)', '2020-11-20', 'https://example.com/albums/loi_nho.png', 14, N'Tuyển tập những bản Rap chill, mang đậm chất tự sự và đời thường đặc trưng của Đen Vâu.'),
+(115, N'Thriller', '1982-11-30', 'https://example.com/albums/thriller.png', 15, N'Album bán chạy nhất mọi thời đại, biểu tượng văn hóa đại chúng của ông hoàng nhạc Pop Michael Jackson.'),
+(116, N'Hoàng', '2019-10-20', 'https://example.com/albums/hoang.png', 16, N'Album concept đột phá kết hợp chất liệu văn học, dân gian Việt Nam với âm nhạc điện tử hiện đại.'),
+(117, N'Dramatic', '2018-12-21', 'https://example.com/albums/dramatic.png', 17, N'Album thể hiện cá tính âm nhạc mạnh mẽ, hiện đại và đầy màu sắc của Bích Phương.'),
+(118, N'The Playah', '2020-12-15', 'https://example.com/albums/the_playah.png', 18, N'EP (Extended Play) với bản phối mới dài 7 phút cực kỳ ấn tượng, khẳng định tư duy âm nhạc đỉnh cao của Touliver và Soobin.'),
+(119, N'Sóng Gió (Tuyển tập)', '2019-12-20', 'https://example.com/albums/song_gio.png', 19, N'Tuyển tập những bản hit đình đám mang âm hưởng miền Tây kết hợp EDM đã làm nên tên tuổi của Jack và K-ICM.'),
+(120, N'Love Songs Collection', '2014-09-15', 'https://example.com/albums/love_songs_collection.png', 20, N'Bộ sưu tập những bản tình ca lãng mạn và da diết nhất qua giọng hát nồng nàn của Hồ Ngọc Hà.');
+
 SET IDENTITY_INSERT albums OFF;
 GO
 
@@ -227,11 +239,11 @@ GO
 SET IDENTITY_INSERT songs ON;
 INSERT INTO songs (song_id, song_title, song_release_date, song_duration_seconds, song_audio_url, song_cover_url, song_is_explicit, song_play_count)
 VALUES
-(1041, N'An Trần 100', '2020-01-01', 210, 'http://audio.com/s1041.mp3', 'https://example.com/songs/an_tran_100.png', 0, 23123),
+(1041, N'An Trần 100', '2020-01-01', 210, 'http://audio.com/s1041.mp3', 'https://example.com/songs/an_tran_100.png', 0, 2323),
 (1042, N'Bài Hát Mới', '2020-02-01', 220, 'http://audio.com/s1042.mp3', 'https://example.com/songs/bai_hat_moi.png', 0, 2342),
 (1043, N'Giai Điệu Cuộc Sống', '2020-03-01', 230, 'http://audio.com/s1043.mp3', 'https://example.com/songs/giai_dieu_cuoc_song.png', 0, 123),
-(1044, N'Khúc Ca Yêu Thương', '2020-04-01', 240, 'http://audio.com/s1044.mp3', 'https://example.com/songs/khuc_ca_yeu_thuong.png', 0, 982347983),
-(1045, N'Niềm Vui Mới', '2020-05-01', 250, 'http://audio.com/s1045.mp3', 'https://example.com/songs/niem_vui_moi.png', 0, 234234);
+(1044, N'Khúc Ca Yêu Thương', '2020-04-01', 240, 'http://audio.com/s1044.mp3', 'https://example.com/songs/khuc_ca_yeu_thuong.png', 0, 83),
+(1045, N'Niềm Vui Mới', '2020-05-01', 250, 'http://audio.com/s1045.mp3', 'https://example.com/songs/niem_vui_moi.png', 0, 24);
 
 SET IDENTITY_INSERT songs OFF;
 GO
