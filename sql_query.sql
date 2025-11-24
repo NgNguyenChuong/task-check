@@ -76,12 +76,67 @@ WHERE follower_id = 5 AND following_id = 6;
 -- Người dùng có user_id = 9 bỏ thích album có album_id = 111
 DELETE FROM user_like_albums
 WHERE user_id = 9 AND album_id = 111;
+-- ============================================================
+-- CÂU LỆNH DELETE (KÈM KIỂM TRA)
+-- ============================================================
 
--- sử dụng procedure xoá user có user_id = 10
+-- 1. Xoá 1 lượt like: User 5 bỏ thích bài hát 1003
+SELECT * FROM user_like_songs WHERE user_id = 5 AND song_id = 1003; -- Kiểm tra trước
+DELETE FROM user_like_songs
+WHERE user_id = 5 AND song_id = 1003;
+SELECT * FROM user_like_songs WHERE user_id = 5 AND song_id = 1003; -- Kiểm tra sau (kết quả phải rỗng)
+
+-- 2. Xoá lời bài hát của bài hát có song_id = 1006
+SELECT * FROM lyrics WHERE song_id = 1006; -- Kiểm tra trước
+DELETE FROM lyrics
+WHERE song_id = 1006;
+SELECT * FROM lyrics WHERE song_id = 1006; -- Kiểm tra sau
+
+-- 3. Người dùng (id=5) bỏ theo dõi nghệ sĩ (id=1)
+SELECT * FROM user_follow_artists WHERE user_id = 5 AND artist_id = 1; -- Kiểm tra trước
+DELETE FROM user_follow_artists
+WHERE user_id = 5 AND artist_id = 1;
+SELECT * FROM user_follow_artists WHERE user_id = 5 AND artist_id = 1; -- Kiểm tra sau
+-- 4. Người dùng (id=5) bỏ theo dõi người dùng khác (id=6)
+SELECT * FROM user_follow_users WHERE follower_id = 5 AND following_id = 6; -- Kiểm tra trước
+DELETE FROM user_follow_users
+WHERE follower_id = 5 AND following_id = 6;
+SELECT * FROM user_follow_users WHERE follower_id = 5 AND following_id = 6; -- Kiểm tra sau
+
+-- 5. Người dùng (id=9) bỏ like album (id=111)
+SELECT * FROM user_like_albums WHERE user_id = 9 AND album_id = 111; -- Kiểm tra trước
+DELETE FROM user_like_albums
+WHERE user_id = 9 AND album_id = 111;
+SELECT * FROM user_like_albums WHERE user_id = 9 AND album_id = 111; -- Kiểm tra sau
+
+
+-- 6. Sử dụng procedure xoá user có user_id = 10
+-- Kiểm tra xem user còn tồn tại không
+SELECT * FROM users WHERE user_id = 10; 
+-- Kiểm tra xem user này có đang follow ai không (để test logic xoá follow trước khi xoá user)
+SELECT * FROM user_follow_users WHERE follower_id = 10 OR following_id = 10; 
+
 EXEC sp_DeleteUser @UserIDToDelete = 10;
 
--- sử dụng procedure xoá bài hát có song_id = 1009 ra khỏi playlist có playlist_id = 3
---EXEC sp_RemoveSongFromPlaylist @PlaylistID = 3, @SongID = 1009;
+-- Kiểm tra lại (Kết quả phải rỗng ở cả 2 bảng)
+SELECT * FROM users WHERE user_id = 10;
+SELECT * FROM user_follow_users WHERE follower_id = 10 OR following_id = 10;
+
+
+-- 7. Sử dụng procedure xoá bài hát (id=1009) khỏi playlist (id=3)
+-- Kiểm tra xem bài hát đang ở vị trí (track_order) nào
+SELECT * FROM playlist_songs WHERE playlist_id = 3 AND song_id = 1040;
+-- Kiểm tra tổng thể playlist để xem track_order của các bài sau có tự động giảm đi 1 không
+SELECT * FROM playlist_songs WHERE playlist_id = 3 ORDER BY track_order;
+
+EXEC sp_RemoveSongFromPlaylist @PlaylistID = 3, @SongID = 1040;
+
+-- Kiểm tra lại (Bài 1009 biến mất, các bài phía sau nhảy số thứ tự lên)
+SELECT * FROM playlist_songs WHERE playlist_id = 3 AND song_id = 1040;
+SELECT * FROM playlist_songs WHERE playlist_id = 3 ORDER BY track_order;
+
+
+
 
 -- Câu lệnh truy vấn SELECT
 
@@ -215,12 +270,12 @@ FROM users u
 JOIN user_like_songs uls ON u.user_id = uls.user_id
 GROUP BY u.user_username;
 
--- 15 tìm username của những user đã bị thu hồi token(revoked = 1)
-SELECT u.user_username
+
+-- 15. Tìm username của những user có token đã bị thu hồi (dựa vào token_revoked_at khác NULL)
+SELECT DISTINCT u.user_username
 FROM users u
 JOIN user_tokens ut ON u.user_id = ut.user_id
-WHERE token_revoked = 1;
-
+WHERE ut.token_revoked_at IS NOT NULL;
 -- 16 Lấy thông tin các bài hát nằm trong các album được phát hành bởi nghệ sĩ "Sơn Tùng M-TP"
 SELECT
     s.song_title,
@@ -273,8 +328,3 @@ FROM songs s
 JOIN user_like_songs uls ON s.song_id = uls.song_id
 GROUP BY s.song_title
 HAVING COUNT(uls.user_id) > 2;
-
-
-
-
-temp

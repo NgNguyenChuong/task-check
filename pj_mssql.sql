@@ -28,6 +28,10 @@ ALTER TABLE users
 ADD CONSTRAINT CK_user_role_validity
 CHECK (user_role IN ('user', 'artist', 'admin'));
 GO
+-- thêm ràng buộc kiểm tra số lần đăng nhập thất bại phải từ 0 đến 5
+ALTER TABLE users
+ADD CONSTRAINT CK_user_failed_login_range
+CHECK (user_failed_login_attempts >= 0 AND user_failed_login_attempts <= 5);
 
 CREATE TABLE user_tokens (
     token_id INT PRIMARY KEY IDENTITY(1,1),
@@ -37,7 +41,7 @@ CREATE TABLE user_tokens (
     token_created_at DATETIME2 DEFAULT GETDATE(), -- thời điểm tạo token
     token_device_info VARCHAR(255),
     -- đánh dấu token đã bị thu hồi (revoked) hay chưa
-    token_revoked BIT DEFAULT 0, -- đánh dấu token đã bị thu hồi (revoked) hay chưa
+    token_revoked_at DATETIME2 NULL, -- đánh dấu token đã bị thu hồi từ lúc nào
     token_ip_address VARCHAR(45), -- địa chỉ IP khi tạo token
     user_id INT NOT NULL -- FK tới bảng users
 );
@@ -702,6 +706,9 @@ GO
 CREATE INDEX idx_tokens_hash ON user_tokens (token_hash);
 -- Hỗ trợ join/tìm token theo user_id (FK)
 CREATE INDEX idx_tokens_user_id ON user_tokens (user_id);
+GO
+-- Thêm index hỗ trợ tác vụ nền xoá token hết hạn
+CREATE INDEX idx_token_expires_at ON user_tokens(token_expires_at);
 GO
 
 -- Bảng artists

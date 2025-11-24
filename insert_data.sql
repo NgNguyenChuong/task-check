@@ -74,30 +74,32 @@ GO
 -----------------------------------------------------
 -- 3. Bảng user_tokens (Yêu cầu: 20 dòng)
 -----------------------------------------------------
-
-INSERT INTO user_tokens (token_hash, token_expires_at, token_device_info, user_id, token_revoked, token_ip_address)
+INSERT INTO user_tokens (token_hash, token_expires_at, token_device_info, user_id, token_revoked_at, token_ip_address)
 VALUES
-('token_hash_1', DATEADD(day, 30, GETDATE()), 'Chrome on Windows', 1, 0, '192.168.1.1'),
-('token_hash_2', DATEADD(day, 7, GETDATE()), 'iOS App 1.2.3', 2, 0, '203.0.113.5'),
-('token_hash_3', DATEADD(day, 7, GETDATE()), 'Android App 2.0', 3, 0, '198.51.100.10'),
-('token_hash_4', DATEADD(day, 30, GETDATE()), 'Safari on macOS', 4, 0, '203.0.113.11'),
-('token_hash_5', DATEADD(hour, 12, GETDATE()), 'Firefox on Linux', 5, 0, '192.168.1.2'),
-('token_hash_6', DATEADD(day, 1, GETDATE()), 'iOS App 1.2.4', 6, 0, '203.0.113.15'),
-('token_hash_7', DATEADD(day, 7, GETDATE()), 'Samsung Browser', 7, 0, '198.51.100.20'),
-('token_hash_8', DATEADD(day, 30, GETDATE()), 'Chrome on macOS', 8, 0, '203.0.113.21'),
-('token_hash_9', DATEADD(hour, 6, GETDATE()), 'Edge on Windows', 9, 0, '192.168.1.3'),
-('token_hash_10', DATEADD(day, 7, GETDATE()), 'iPad App 1.2.3', 10, 0, '203.0.113.25'),
-('token_hash_11', DATEADD(day, 30, GETDATE()), 'Pixel App 2.1', 11, 0, '198.51.100.30'),
-('token_hash_12', DATEADD(hour, 24, GETDATE()), 'Opera on macOS', 12, 0, '203.0.113.31'),
-('token_hash_13', DATEADD(day, 7, GETDATE()), 'Firefox on Windows', 13, 0, '192.168.1.4'),
-('token_hash_14', DATEADD(day, -1, GETDATE()), 'iOS App 1.2.0 (Revoked)', 14, 1, '203.0.113.35'),
-('token_hash_15', DATEADD(day, 30, GETDATE()), 'Xiaomi Browser', 15, 0, '198.51.100.40'),
-('token_hash_16', DATEADD(day, 7, GETDATE()), 'Macbook (Revoked)', 16, 1, '203.0.113.41'),
-('token_hash_17', DATEADD(day, 60, GETDATE()), 'Windows PC', 17, 0, '192.168.1.5'),
-('token_hash_18', DATEADD(day, 7, GETDATE()), 'iOS App 1.3.0', 18, 0, '203.0.113.45'),
-('token_hash_19', DATEADD(day, 30, GETDATE()), 'Android Tablet', 19, 0, '198.51.100.50'),
-('token_hash_20', DATEADD(day, 1, GETDATE()), 'Mac Mini', 20, 0, '203.0.113.51'),
-('token_hash_21', DATEADD(day, 15, GETDATE()), 'Linux Desktop', 1, 0, '192.168.1.6');
+('token_hash_1', DATEADD(day, 30, GETDATE()), 'Chrome on Windows', 1, NULL, '192.168.1.1'),
+('token_hash_2', DATEADD(day, 7, GETDATE()), 'iOS App 1.2.3', 2, NULL, '203.0.113.5'),
+('token_hash_3', DATEADD(day, 7, GETDATE()), 'Android App 2.0', 3, NULL, '198.51.100.10'),
+('token_hash_4', DATEADD(day, 30, GETDATE()), 'Safari on macOS', 4, NULL, '203.0.113.11'),
+('token_hash_5', DATEADD(hour, 12, GETDATE()), 'Firefox on Linux', 5, NULL, '192.168.1.2'),
+('token_hash_6', DATEADD(day, 1, GETDATE()), 'iOS App 1.2.4', 6, NULL, '203.0.113.15'),
+('token_hash_7', DATEADD(day, 7, GETDATE()), 'Samsung Browser', 7, NULL, '198.51.100.20'),
+('token_hash_8', DATEADD(day, 30, GETDATE()), 'Chrome on macOS', 8, NULL, '203.0.113.21'),
+('token_hash_9', DATEADD(hour, 6, GETDATE()), 'Edge on Windows', 9, NULL, '192.168.1.3'),
+('token_hash_10', DATEADD(day, 7, GETDATE()), 'iPad App 1.2.3', 10, NULL, '203.0.113.25'),
+('token_hash_11', DATEADD(day, 30, GETDATE()), 'Pixel App 2.1', 11, NULL, '198.51.100.30'),
+('token_hash_12', DATEADD(hour, 24, GETDATE()), 'Opera on macOS', 12, NULL, '203.0.113.31'),
+('token_hash_13', DATEADD(day, 7, GETDATE()), 'Firefox on Windows', 13, NULL, '192.168.1.4'),
+
+-- Các token revoked
+('token_hash_14', DATEADD(day, -1, GETDATE()), 'iOS App 1.2.0 (Revoked)', 14, GETDATE(), '203.0.113.35'),
+('token_hash_16', DATEADD(day, 7, GETDATE()), 'Macbook (Revoked)', 16, GETDATE(), '203.0.113.41'),
+
+('token_hash_15', DATEADD(day, 30, GETDATE()), 'Xiaomi Browser', 15, NULL, '198.51.100.40'),
+('token_hash_17', DATEADD(day, 60, GETDATE()), 'Windows PC', 17, NULL, '192.168.1.5'),
+('token_hash_18', DATEADD(day, 7, GETDATE()), 'iOS App 1.3.0', 18, NULL, '203.0.113.45'),
+('token_hash_19', DATEADD(day, 30, GETDATE()), 'Android Tablet', 19, NULL, '198.51.100.50'),
+('token_hash_20', DATEADD(day, 1, GETDATE()), 'Mac Mini', 20, NULL, '203.0.113.51'),
+('token_hash_21', DATEADD(day, 15, GETDATE()), 'Linux Desktop', 1, NULL, '192.168.1.6');
 GO
 
 -----------------------------------------------------
