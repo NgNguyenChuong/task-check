@@ -26,56 +26,40 @@ SELECT * FROM payments;
 -- Câu lệnh update
 
 -- Cập nhật bio của user có username là 'chuong_user' thành 'Đây là bio mới của tôi. Tôi thích nghe nhạc Pop.'
+SELECT * FROM users WHERE user_username = 'chuong_user'; -- Kiểm tra trước
 UPDATE users
 SET user_bio = N'Đây là bio mới của tôi. Tôi thích nghe nhạc Pop.'
 WHERE user_username = 'chuong_user';
-
+SELECT * FROM users WHERE user_username = 'chuong_user'; -- Kiểm tra sau
 -- Cập nhật tên và mô tả của playlist thành Nhạc chill và mô tả thành Nhẹ nhàng, vui vẻ cho playlist có playlist_id = 5
+SELECT * FROM playlists WHERE playlist_id = 5; -- Kiểm tra trước
 UPDATE playlists
 SET playlist_name = N'Nhạc chill',
     playlist_description = N'Nhẹ nhàng, vui vẻ'
 WHERE playlist_id = 5;
+SELECT * FROM playlists WHERE playlist_id = 5; -- Kiểm tra sau
 
--- Cập nhật role của user_id = 5 trong playlist_id = 1 thành 'contributor'
+-- Cập nhật role của user_id = 11 trong playlist_id = 6 thành 'contributor'
+SELECT * FROM user_playlists WHERE user_id = 11 AND playlist_id = 6; -- Kiểm tra trước
 UPDATE user_playlists
 SET role = 'contributor'
 WHERE user_id = 11 AND playlist_id = 6;
+SELECT * FROM user_playlists WHERE user_id = 11 AND playlist_id = 6; -- Kiểm tra sau
 
 -- Tăng số lần đăng nhập thất bại của user có username là 'phong_user' lên 1 và cập nhật thời gian đăng nhập thất bại cuối cùng
+SELECT * FROM users WHERE user_username = 'phong_user'; -- Kiểm tra trước
 UPDATE users
 SET user_failed_login_attempts = user_failed_login_attempts + 1,
     user_last_failed_login = GETDATE()
 WHERE user_username = 'phong_user';
-
+SELECT * FROM users WHERE user_username = 'phong_user'; -- Kiểm tra sau 
 -- Cập nhật trạng thái của payment có payment_id = 18 thành completed và cập nhật thời gian cập nhật payment
+SELECT * FROM payments WHERE payment_id = 18; -- Kiểm tra trước
 UPDATE payments
 SET payment_status = 'completed'
 WHERE payment_id = 18;
+SELECT * FROM payments WHERE payment_id = 18; -- Kiểm tra sau
 
--- Câu lệnh DELETE
-
--- Xoá 1 lượt like, người dùng có user_id=5 bỏ thích bài hát có song_id = 1003
-DELETE FROM user_like_songs
-WHERE user_id = 5 AND song_id = 1003;
-
--- xoá lời bài hát của bài hát có song_id = 1006
-DELETE FROM lyrics
-WHERE song_id = 1006;
-
--- Người dùng unfollow 1 nghệ sĩ, 
--- Người dùng có user_id = 5 bỏ theo dõi nghệ sĩ có artist_id = 1
-DELETE FROM user_follow_artists
-WHERE user_id = 5 AND artist_id = 1;
-
--- Người dùng bỏ theo dõi 1 người dùng khác,
--- Người dùng có user_id =5  bỏ theo dõi người dùng có user_id = 6
-DELETE FROM user_follow_users
-WHERE follower_id = 5 AND following_id = 6;
-
--- người dùng bỏ like 1 album,
--- Người dùng có user_id = 9 bỏ thích album có album_id = 111
-DELETE FROM user_like_albums
-WHERE user_id = 9 AND album_id = 111;
 -- ============================================================
 -- CÂU LỆNH DELETE (KÈM KIỂM TRA)
 -- ============================================================
@@ -97,6 +81,7 @@ SELECT * FROM user_follow_artists WHERE user_id = 5 AND artist_id = 1; -- Kiểm
 DELETE FROM user_follow_artists
 WHERE user_id = 5 AND artist_id = 1;
 SELECT * FROM user_follow_artists WHERE user_id = 5 AND artist_id = 1; -- Kiểm tra sau
+
 -- 4. Người dùng (id=5) bỏ theo dõi người dùng khác (id=6)
 SELECT * FROM user_follow_users WHERE follower_id = 5 AND following_id = 6; -- Kiểm tra trước
 DELETE FROM user_follow_users
@@ -189,7 +174,7 @@ FROM artists ar
 JOIN albums al ON ar.artist_id = al.artist_id
 GROUP BY ar.artist_name
 
--- 7Đếm số lượng người dùng có đăng ký (subscription) đang hoạt động theo quốc gia
+-- 7 Đếm số lượng người dùng có đăng ký (subscription) đang hoạt động theo quốc gia
 SELECT
     u.user_country_code,
     COUNT(DISTINCT s.subscription_id) AS so_nguoi_dung_premium

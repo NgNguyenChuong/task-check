@@ -12,9 +12,6 @@ CREATE TABLE users (
     -- user_last_active DATETIME2 DEFAULT GETDATE(),
     user_created_at DATETIME2 DEFAULT GETDATE(), -- thời điểm tạo tài khoản
     user_updated_at DATETIME2 DEFAULT GETDATE(), -- thời điểm cập nhật thông tin tài khoản gần nhất
-
-    -- soft delete
-    -- user_is_active BIT DEFAULT 1,
     user_role VARCHAR(10) DEFAULT 'user', -- vai trò của user trong hệ thống: 'user', 'artist', 'admin'
 
     -- Thêm các cột để theo dõi số lần đăng nhập thất bại và trạng thái khóa tài khoản
@@ -491,7 +488,33 @@ GO
 -- *** TRIGGER QUAN TRỌNG CHO BẢNG LISTENS ***
 ---
 
--- Tăng play_count khi INSERT
+--1 khóa tài khoản khi đăng nhập thất bại >= 5 lần
+GO
+CREATE TRIGGER trg_LockUserAccount
+ON users
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF TRIGGER_NESTLEVEL() > 1 RETURN;
+    IF NOT UPDATE(user_failed_login_attempts) RETURN;
+
+    -- Thực hiện update trạng thái khóa
+    UPDATE u
+    SET 
+        user_account_locked_until =
+            CASE 
+                -- Nếu sai >= 5 lần -> Khóa 15 phút tính từ hiện tại
+                WHEN i.user_failed_login_attempts >= 5 
+                    THEN DATEADD(MINUTE, 15, GETDATE()) 
+                -- Nếu số lần sai < 5 (ví dụ đã reset về 0) -> Mở khóa (NULL)
+                ELSE NULL
+            END
+    FROM users u
+    INNER JOIN inserted i ON u.user_id = i.user_id;
+END;
+GO
+--2 Tăng play_count khi INSERT
 CREATE TRIGGER trg_increment_song_play_count
 ON listens
 AFTER INSERT
@@ -510,7 +533,7 @@ BEGIN
 END;
 GO
 
--- Giảm play_count khi DELETE (Sẽ được kích hoạt khi User bị hard-delete)
+--3 Giảm play_count khi DELETE (Sẽ được kích hoạt khi User bị hard-delete)
 CREATE TRIGGER trg_decrement_song_play_count
 ON listens
 AFTER DELETE
@@ -542,12 +565,9 @@ BEGIN
     WHERE s.song_play_count < 0;
 END;
 GO
-
----
--- *** TRIGGER QUAN TRỌNG KHÁC ***
 ---
 
--- Tự động set ngày hết hạn subscription
+--4 Tự động set ngày hết hạn subscription
 CREATE TRIGGER trg_set_subscription_end
 ON subscriptions
 AFTER INSERT
@@ -568,7 +588,7 @@ BEGIN
 END;
 GO
 
--- Dọn dẹp playlist mồ côi (Rất quan trọng)
+--5 Dọn dẹp playlist mồ côi (Rất quan trọng)
 -- Kích hoạt khi một liên kết user-playlist bị xóa
 CREATE TRIGGER trg_cleanup_orphan_playlists
 ON user_playlists
